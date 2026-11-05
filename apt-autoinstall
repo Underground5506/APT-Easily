@@ -1,13 +1,49 @@
-print "==============="
-print "apt-autoinstall"
-print "==============="
-print "select the file that is listed the apps that you want to install"
+#!/usr/bin/env bash
+set -euo pipefail
 
-if 
-    1) openfile explorer to select the file
-if 
-    2) 
-        print "write down the path for the file"
-if
-    *
-        print " the file format should be valid or it wont be taken care of "
+printf '%s\n' '===============' 'apt-autoinstall' '==============='
+echo "Choose a text file containing one APT package name per line."
+
+if ! command -v apt-get >/dev/null 2>&1; then
+    echo "Error: apt-get was not found. This script requires a Debian-based system." >&2
+    exit 1
+fi
+
+if command -v zenity >/dev/null 2>&1 &&
+   [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ]]; then
+    file=$(zenity --file-selection --title="Select a package list") || exit 0
+else
+    read -r -p "Enter the path to the package list: " file
+fi
+
+if [[ ! -f "$file" || ! -r "$file" ]]; then
+    echo "Error: '$file' is not a readable file." >&2
+    exit 1
+fi
+
+packages=()
+
+while IFS= read -r line || [[ -n "$line" ]]; do
+    line="${line%%#*}"
+    line="${line#"${line%%[![:space:]]*}"}"
+    line="${line%"${line##*[![:space:]]}"}"
+
+    [[ -z "$line" ]] && continue
+
+    if [[ ! "$line" =~ ^[a-z0-9][a-z0-9+.-]*$ ]]; then
+        echo "Error: invalid package name: '$line'" >&2
+        exit 1
+    fi
+
+    packages+=("$line")
+done < "$file"
+
+if [[ ${#packages[@]} -eq 0 ]]; then
+    echo "No package names were found in '$file'."
+    exit 0
+fi
+
+echo "Packages to install:"
+printf '  %s\n' "${packages[@]}"
+sudo -v
+sudo apt-get install "${packages[@]}"
