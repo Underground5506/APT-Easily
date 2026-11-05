@@ -1,0 +1,13 @@
+print "==============="
+print "apt-autoinstall"
+print "==============="
+print "select the file that is listed the apps that you want to install"
+
+if 
+    1) openfile explorer to select the file
+if 
+    2) 
+        print "write down the path for the file"
+if
+    *
+        print " the file format should be valid or it wont be taken care of "
