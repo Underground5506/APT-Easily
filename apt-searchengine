@@ -1,0 +1,34 @@
+@echo off
+setlocal
+
+echo =================
+echo APT Search Engine
+echo =================
+echo.
+
+set "credit=Author BLACKREAPER38 on GitHub"
+
+:menu
+echo 1. Search
+echo 2. Exit
+echo.
+set /p "USER=Choose an option: "
+
+if "%USER%"=="1" goto search
+if "%USER%"=="2" goto exit
+echo Invalid option.
+echo.
+goto menu
+
+:search
+set /p "package_name=Enter package name: "
+echo.
+apt search "%package_name%"
+echo.
+pause
+goto menu
+
+:exit
+echo %credit%
+timeout /t 2 >nul
+exit /b
