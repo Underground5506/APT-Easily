@@ -1,20 +1,26 @@
+
 #!/bin/sh
 
 # APT Search Engine
-# Requires apt-cache (available on Debian, Ubuntu, and many APT-based derivatives).
+# Requires apt-cache (Debian, Ubuntu and APT-based distributions).
 
 credit='Author BLACKREAPER38 on GitHub'
 
-printf '%s\n' '=================' 'APT Search Engine' '=================' ''
+printf '%s\n' '=================' ' APT Search Engine' '=================' ''
 
+# Check APT availability
 if ! command -v apt-cache >/dev/null 2>&1; then
-    printf '%s\n' 'Error: apt-cache was not found.' \
-        'This script requires an APT-based system, such as Debian or Ubuntu.' >&2
+    printf '%s\n' \
+        'Error: apt-cache was not found.' \
+        'This script requires an APT-based system.' >&2
     exit 1
 fi
 
 while :; do
-    printf '%s\n' '1. Search' '2. Exit' ''
+    printf '%s\n' \
+        '1. Search' \
+        '2. Exit' ''
+
     printf 'Choose an option: '
 
     if ! IFS= read -r choice; then
@@ -22,9 +28,10 @@ while :; do
         exit 0
     fi
 
-    case $choice in
+    case "$choice" in
         1)
-            printf 'Enter package name or search term: '
+            printf '\nEnter package name or search term: '
+
             if ! IFS= read -r package_name; then
                 printf '\n%s\n' "$credit"
                 exit 0
@@ -36,16 +43,26 @@ while :; do
             fi
 
             printf '\nSearch results for: %s\n\n' "$package_name"
-            apt-cache search -- "$package_name"
-            printf '\n'
+
+            results=$(apt-cache search -- "$package_name" 2>&1)
+            status=$?
+
+            if [ "$status" -ne 0 ]; then
+                printf 'Search failed: %s\n\n' "$results" >&2
+            elif [ -z "$results" ]; then
+                printf '%s\n\n' 'No matching packages found.'
+            else
+                printf '%s\n\n' "$results"
+            fi
             ;;
+
         2)
-            printf '%s\n' "$credit"
+            printf '\n%s\n' "$credit"
             exit 0
             ;;
+
         *)
             printf '%s\n\n' 'Invalid option. Enter 1 or 2.'
             ;;
     esac
-
 done
