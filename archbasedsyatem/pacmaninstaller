@@ -132,6 +132,6 @@ def main():
 
 if __name__ == "__main__":
     if shutil.which("pacman") is None:
-        print("Error: This program requires Arch Linux or pacman.")
+        print("Error: This program requires Arch Linux or other linux distro that use pacman as main manager.")
     else:
         main()
